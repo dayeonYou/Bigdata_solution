@@ -10,7 +10,7 @@ const Container = styled.div`
   justify-content: center; /* 세로 가운데 정렬 */
   align-items: center; /* 가로 가운데 정렬 */
   height: 100vh; /* 전체 화면 높이 */
-  background-color: #f9f9f9; /* 배경색 */
+  //background-color: #f9f9f9; /* 배경색 */
 `;
 
 const Icon = styled.img`
@@ -46,7 +46,7 @@ const InvestigationInfoPage = () => {
         주요 쓰레기 종류도 선택하여 환경 보호 활동을 쉽게 관리할 수 있습니다.
       </Description>
       <CustomButton
-        to="/check/form" // 버튼 클릭 시 이동할 경로 설정
+        to="/app/check/form" // 버튼 클릭 시 이동할 경로 설정
         style={{
           marginTop: "20px", // 위 여백
           width: "150px", // 버튼 너비

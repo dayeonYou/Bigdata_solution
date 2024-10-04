@@ -4,6 +4,7 @@ import PoetsenOne from "./assets/fonts/PoetsenOne-Regular.ttf";
 import KotraHope from "./assets/fonts/KOTRAHOPE.ttf";
 import OleoScriptSwashCapsBold from "./assets/fonts/OleoScriptSwashCaps-Bold.ttf";
 import OleoScriptSwashCapsRegular from "./assets/fonts/OleoScriptSwashCaps-Regular.ttf";
+
 const GlobalStyle = createGlobalStyle`
 @font-face { 
   font-family: "Pretendard";
@@ -41,26 +42,29 @@ body {
     font-family: 'Pretendard';
     margin: 0;
     font-size: 16px;
-    background-color: #f9f9f9; /* 배경색 */
-    .wrap{
+    background-color: #FAFAFA; /* 기존의 배경색 */
+    background:  #FAFAFA;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+.wrap {
     display: flex;
     justify-content: center;
     flex-direction: column;
     align-items: center;
     height: 100vh;
-    background-color: #f3f5f6;
-
-    }
+    background-color: transparent; /* wrap 내부는 투명하게 유지 */
 }
 
-.start{
+.start {
   opacity: 0;
 }
-.end{
+
+.end {
   opacity: 1;
   transition : opacity 5s;
 }
-
 `;
 
 export default GlobalStyle;

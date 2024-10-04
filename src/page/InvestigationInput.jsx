@@ -8,48 +8,45 @@ import { Flex } from "../style/Flex";
 // **스타일 컴포넌트**
 const Container = styled.div`
   display: flex;
-  justify-content: center;
   flex-direction: column;
   align-items: center;
-  margin: 20px;
+  margin: 50px 20px;
   padding: 20px;
   border: 1px solid #ddd;
   border-radius: 8px;
   max-width: 600px;
   background-color: white;
-  margin-bottom: 20px;
-  margin-top: 50px;
 `;
+
 const Label = styled(Form.Label)`
-  font-weight: bold; /* 제목을 굵게 스타일 */
+  font-weight: bold;
   font-family: "Pretendard";
 `;
+
 const InputField = styled(Form.Control)`
   font-family: "Pretendard";
-  margin-bottom: 25px;
-  margin-top: 10px;
-  width: 100%;
+  margin: 10px 0 25px 0;
   height: 40px;
-  border: 1px solid rgba(10, 175, 222, 0.5); /* **투명도 50%** */
+  border: 1px solid rgba(10, 175, 222, 0.5);
 `;
 
 const CheckboxContainer = styled.div`
   margin-bottom: 15px;
 `;
 
-// **새로운 스타일 컴포넌트로 폰트 설정**
 const ModeName = styled.div`
-  font-family: "KotraHope"; /* **원하는 폰트로 변경** */
+  font-family: "KotraHope";
   font-size: 24px;
   color: #0573ac;
   margin-bottom: 5px;
-  letter-spacing: 0.08em; /* **글자 간격을 조금 넓힘** */
+  letter-spacing: 0.08em;
 `;
 
 const ModeInfo = styled.div`
   font-size: 12px;
   color: grey;
 `;
+
 const PhotoPreview = styled.img`
   margin-top: 10px;
   max-width: 100%;
@@ -62,27 +59,22 @@ const DefaultImageContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-
   height: 200px;
   background-color: #e0e0e0;
   color: #777;
   font-size: 16px;
   border-radius: 8px;
 `;
-const TrashTypeLabel = styled.span`
-  font-size: 12px;
-  color: #999;
-`;
 
 const InvestigationInput = () => {
   // **상태 관리**
   const [formData, setFormData] = useState({
-    username: "Kim chul su",
+    username: "Kim chulsu",
     coast_name: "",
     length: "",
     pollution_level: "",
-    waste_type: "",
-    photo_url: "http://example.com/photo.jpg", // **사진 URL이 저장될 위치**
+    waste_type: "", // 선택된 쓰레기 종류
+    photo_url: "http://example.com/photo.jpg",
     timestamp: "",
     latitude: "",
     longitude: "",
@@ -100,8 +92,8 @@ const InvestigationInput = () => {
         const { latitude, longitude } = position.coords;
         setFormData((prevData) => ({
           ...prevData,
-          latitude: latitude.toString(), // 위도
-          longitude: longitude.toString(), // 경도
+          latitude: latitude.toString(),
+          longitude: longitude.toString(),
         }));
       });
     }
@@ -124,25 +116,34 @@ const InvestigationInput = () => {
     input.click();
   };
 
-  // **주요 쓰레기 종류**
-  const trashTypes = [
-    { type: "페어구류", example: "(그물, 밧줄, 양식 자재 등)" },
-    { type: "부포류", example: "(스티로폼 부표, 인증 부표 등)" },
-    { type: "생활쓰레기류", example: "(음료수병, 포장비닐, 과자봉지, 캔 등)" },
-    { type: "대형 투기쓰레기류", example: "(가전제품, 타이어 등)" },
-    { type: "초목류", example: "(자연목, 인공목 등)" },
-  ];
-
+  // **쓰레기 종류 및 오염도 변경 핸들러**
   const handleTrashSelection = (event) => {
     const { value } = event.target;
+    // 숫자로 변환하여 상태 관리
     setFormData((prevData) => ({ ...prevData, waste_type: value }));
   };
 
+  const handlePollutionLevelChange = (event) => {
+    const { value } = event.target;
+    setFormData((prevData) => ({ ...prevData, pollution_level: value }));
+  };
+
+  // **제출 핸들러**
   const handleSubmit = async (event) => {
     event.preventDefault();
 
     // 데이터 확인
-    console.log("Sending data:", formData);
+    console.log("Sending data:", {
+      username: formData.username,
+      photo_url: formData.photo_url,
+      timestamp: formData.timestamp,
+      coast_name: formData.coast_name,
+      length: parseFloat(formData.length),
+      pollution_level: formData.pollution_level,
+      waste_type: formData.waste_type, // 백엔드에 보낼 때는 여기에 숫자값
+      latitude: formData.latitude,
+      longitude: formData.longitude,
+    });
 
     try {
       const response = await axios.post(
@@ -154,7 +155,7 @@ const InvestigationInput = () => {
           coast_name: formData.coast_name,
           length: parseFloat(formData.length),
           pollution_level: formData.pollution_level,
-          waste_type: formData.waste_type,
+          waste_type: parseInt(formData.waste_type), // INT로 변환하여 전송
           latitude: formData.latitude,
           longitude: formData.longitude,
         },
@@ -165,7 +166,8 @@ const InvestigationInput = () => {
         }
       );
 
-      console.log("Response:", response.data);
+      // 서버 응답 확인
+      console.log("Response from server:", response.data);
 
       if (response.data.status === "success") {
         alert(`Investigation submitted! ID: ${response.data.investigation_id}`);
@@ -181,6 +183,19 @@ const InvestigationInput = () => {
       alert("Failed to submit the investigation.");
     }
   };
+
+  // **주요 쓰레기 종류**
+  const trashTypes = [
+    { type: "페어구류", example: "(그물, 밧줄, 양식 자재 등)", value: 1 },
+    { type: "부포류", example: "(스티로폼 부표, 인증 부표 등)", value: 2 },
+    {
+      type: "생활쓰레기류",
+      example: "(음료수병, 포장비닐, 과자봉지, 캔 등)",
+      value: 3,
+    },
+    { type: "대형 투기쓰레기류", example: "(가전제품, 타이어 등)", value: 4 },
+    { type: "초목류", example: "(자연목, 인공목 등)", value: 5 },
+  ];
 
   return (
     <Flex>
@@ -226,8 +241,7 @@ const InvestigationInput = () => {
                 custom="#FF6347"
                 onClick={takePicture}
                 style={{
-                  marginBottom: "30px",
-                  marginTop: "20px",
+                  margin: "20px 0 30px 0",
                   width: "150px",
                   height: "40px",
                   borderRadius: "8px",
@@ -237,16 +251,19 @@ const InvestigationInput = () => {
               </CustomButton>
             </Form.Group>
           </Form.Group>
+
           <Label>오염 정도 평가</Label>
           <Form.Group>
-            <InputField
-              type="text"
-              placeholder="Enter the pollution level"
+            <Form.Control
+              as="select"
               value={formData.pollution_level}
-              onChange={(e) =>
-                setFormData({ ...formData, pollution_level: e.target.value })
-              }
-            />
+              onChange={handlePollutionLevelChange}
+            >
+              <option value="">Select Pollution Level</option>
+              <option value="low">Low</option>
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
+            </Form.Control>
           </Form.Group>
 
           <Form.Group>
@@ -258,38 +275,45 @@ const InvestigationInput = () => {
             <Label>위도</Label>
             <InputField type="text" value={formData.latitude} readOnly />
           </Form.Group>
+
           <Form.Group>
             <Label>경도</Label>
             <InputField type="text" value={formData.longitude} readOnly />
           </Form.Group>
 
+          <Label>쓰레기 종류</Label>
           <CheckboxContainer>
-            <Label>주요 쓰레기 종류</Label>
-            {trashTypes.map((trash, index) => (
+            {trashTypes.map((trash) => (
               <Form.Check
-                key={index}
+                key={trash.value}
                 type="radio"
                 label={
                   <>
-                    {trash.type}
-                    <TrashTypeLabel> {trash.example}</TrashTypeLabel>
+                    <strong>{trash.type}</strong> {trash.example}
                   </>
                 }
-                value={trash.type.toLowerCase()}
-                name="trashType"
+                value={trash.value}
+                checked={formData.waste_type === trash.value.toString()} // String으로 비교
                 onChange={handleTrashSelection}
-                checked={formData.waste_type === trash.type.toLowerCase()}
               />
             ))}
           </CheckboxContainer>
+
+          <CustomButton
+            type="submit"
+            backgroundColor="custom"
+            custom="#007BFF"
+            style={{
+              marginTop: "20px",
+              width: "100%",
+              height: "40px",
+              borderRadius: "8px",
+            }}
+            onClick={handleSubmit}
+          >
+            Submit
+          </CustomButton>
         </Form>
-        <CustomButton
-          backgroundColor="custom"
-          type="submit"
-          onClick={handleSubmit}
-        >
-          제출하기
-        </CustomButton>
       </Container>
     </Flex>
   );

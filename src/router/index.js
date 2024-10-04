@@ -13,50 +13,55 @@ import TransportPage from "../page/TransportPage";
 import LocationAnalysisPage from "../page/LocationAnalysisPage";
 import DriverInputPage from "../page/DriverInputPage";
 import LoginForm from "../page/LoginPage";
+import OnboardingPage from "../page/OnboardingPage";
 
 const router = createBrowserRouter([
   {
-    path: "/",
-    element: <MainLayout />, // MainLayout을 부모로 설정
+    path: "/", // OnboardingPage를 루트 경로에 설정
+    element: <OnboardingPage />,
+  },
+  {
+    path: "/app", // MainLayout이 필요한 나머지 페이지는 별도의 경로로 설정
+    element: <MainLayout />,
     children: [
       {
-        path: "/",
+        path: "main", // 상대 경로로 수정
         element: <MainPage />,
       },
       {
-        path: "/login",
+        path: "login", // 상대 경로로 수정
         element: <LoginForm />,
       },
       {
-        path: "/check",
+        path: "check",
         element: <InvestigationInfoPage />,
       },
       {
-        path: "/check/form",
+        path: "check/form",
         element: <InvestigationInput />,
       },
       {
-        path: "/cleaner",
+        path: "cleaner",
         element: <CleanerInfoPage />,
       },
       {
-        path: "/cleaner/form",
+        path: "cleaner/form",
         element: <CleanerInput />,
       },
       {
-        path: "/manager",
+        path: "manager",
         element: <ManagerInfoPage />,
       },
       {
-        path: "/manager/form",
+        path: "manager/form",
         element: <ManagerMode />,
       },
       {
-        path: "/driver",
+        path: "driver",
         element: <DriverInfoPage />,
       },
       {
-        path: "/driver/form",
+        path: "driver/form",
         element: <DriverModePage />, // 운전자 모드 페이지 추가
         children: [
           {

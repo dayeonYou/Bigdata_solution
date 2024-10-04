@@ -78,14 +78,13 @@ const TrashTypeLabel = styled.span`
 
 const CleanerInput = () => {
   const [formData, setFormData] = useState({
-    user_id: 1,
+    username: "Kim chulsu",
     coast_name: "",
     length: "",
     collected_amount: "",
-    waste_type: "",
-    photo_url: null,
+    waste_type: "", // 이 값을 숫자로 변경
+    photo_url: "http://example.com/photo.jpg",
     timestamp: "",
-    location: "",
     latitude: "",
     longitude: "",
   });
@@ -101,7 +100,6 @@ const CleanerInput = () => {
         const { latitude, longitude } = position.coords;
         setFormData((prevData) => ({
           ...prevData,
-          location: `위도: ${latitude}, 경도: ${longitude}`,
           latitude,
           longitude,
         }));
@@ -125,34 +123,47 @@ const CleanerInput = () => {
     input.click();
   };
 
-  // 주요 쓰레기 종류
+  // 주요 쓰레기 종류와 매핑
   const trashTypes = [
-    { type: "페어구류", example: "(그물, 밧줄, 양식 자재 등)" },
-    { type: "부표류", example: "(스티로폼 부표, 인증 부표 등)" },
-    { type: "생활쓰레기류", example: "(음료수병, 포장비닐, 과자봉지, 캔 등)" },
-    { type: "대형 투기쓰레기류", example: "(가전제품, 타이어 등)" },
-    { type: "초목류", example: "(자연목, 인공목 등)" },
+    { type: "페어구류", example: "(그물, 밧줄, 양식 자재 등)", value: 1 },
+    { type: "부표류", example: "(스티로폼 부표, 인증 부표 등)", value: 2 },
+    {
+      type: "생활쓰레기류",
+      example: "(음료수병, 포장비닐, 과자봉지, 캔 등)",
+      value: 3,
+    },
+    { type: "대형 투기쓰레기류", example: "(가전제품, 타이어 등)", value: 4 },
+    { type: "초목류", example: "(자연목, 인공목 등)", value: 5 },
   ];
 
   const handleTrashSelection = (event) => {
     const { value } = event.target;
-    setFormData((prevData) => ({ ...prevData, waste_type: value }));
+    setFormData((prevData) => ({ ...prevData, waste_type: value })); // 숫자 값을 사용
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
 
+    // 전송할 데이터 형태를 콘솔에 출력
+    const dataToSend = {
+      username: formData.username,
+      photo_url: formData.photo_url,
+      timestamp: formData.timestamp,
+      coast_name: formData.coast_name,
+      length: parseFloat(formData.length),
+      collected_amount: parseFloat(formData.collected_amount),
+      waste_type: parseInt(formData.waste_type, 10), // 숫자형으로 변환하여 전송
+      latitude: formData.latitude, // 위도 추가
+      longitude: formData.longitude, // 경도 추가
+    };
+
+    console.log("Sending data to the backend:", dataToSend); // 데이터 형태 출력
+
     try {
-      const response = await axios.post("/api/cleanup", {
-        user_id: formData.user_id,
-        photo_url: formData.photo_url,
-        timestamp: formData.timestamp,
-        location: formData.location,
-        coast_name: formData.coast_name,
-        length: parseFloat(formData.length),
-        collected_amount: parseFloat(formData.collected_amount),
-        waste_type: formData.waste_type,
-      });
+      const response = await axios.post(
+        "http://localhost:8080/api/investigation",
+        dataToSend // 수정된 데이터 사용
+      );
 
       if (response.data.status === "success") {
         alert(`Cleanup submitted! ID: ${response.data.cleanup_id}`);
@@ -235,9 +246,14 @@ const CleanerInput = () => {
             <InputField type="text" value={formData.timestamp} readOnly />
           </Form.Group>
 
+          {/* 위도와 경도를 별도로 표시 */}
           <Form.Group>
-            <Label>위경도</Label>
-            <InputField type="text" value={formData.location} readOnly />
+            <Label>위도</Label>
+            <InputField type="text" value={formData.latitude} readOnly />
+          </Form.Group>
+          <Form.Group>
+            <Label>경도</Label>
+            <InputField type="text" value={formData.longitude} readOnly />
           </Form.Group>
 
           <CheckboxContainer>
@@ -252,17 +268,28 @@ const CleanerInput = () => {
                     <TrashTypeLabel> {trash.example}</TrashTypeLabel>
                   </>
                 }
-                value={trash.type.toLowerCase()}
+                value={trash.value} // 숫자 값을 사용
                 name="trashType"
                 onChange={handleTrashSelection}
-                checked={formData.waste_type === trash.type.toLowerCase()}
+                checked={formData.waste_type === trash.value.toString()} // 비교 시 문자열로 변환
               />
             ))}
           </CheckboxContainer>
+          <CustomButton
+            backgroundColor="custom"
+            custom="#FF6347"
+            type="submit"
+            style={{
+              marginTop: "20px",
+              width: "150px",
+              height: "40px",
+              borderRadius: "8px",
+            }}
+            onClick={handleSubmit}
+          >
+            제출
+          </CustomButton>
         </Form>
-        <CustomButton backgroundColor="custom" type="submit">
-          제출하기
-        </CustomButton>
       </Container>
     </Flex>
   );

@@ -14,19 +14,19 @@ export default function ModeContainer() {
   function handleModeClick(mode) {
     switch (mode) {
       case "조사 모드":
-        navigate("/check");
+        navigate("/app/check");
         console.log(mode);
         break;
       case "관리자 모드":
-        navigate("/manager");
+        navigate("/app/manager");
         console.log(mode);
         break;
       case "청소 모드":
-        navigate("/cleaner");
+        navigate("/app/cleaner");
         console.log(mode);
         break;
       case "운전자 모드":
-        navigate("/driver");
+        navigate("/app/driver");
         console.log(mode);
         break;
       default:
@@ -65,25 +65,21 @@ export default function ModeContainer() {
 }
 
 const ModeContainerWrap = styled(Flex, {
-  marginTop: "20px",
-  cursor: "pointer",
-  gap: "20px", // 아이템 간격 추가
-  flexWrap: "wrap", // 아이템이 넘칠 경우 줄 바꿈
+  display: "grid", // 그리드 레이아웃으로 변경
+  gridTemplateColumns: "repeat(2, 1fr)", // 기본적으로 2열 그리드 설정
+  gap: "30px", // 아이템 간격 추가
   maxWidth: "800px", // 최대 너비 제한
 
   // 반응형 스타일
   "@media (max-width: 480px)": {
-    flexDirection: "column", // 모바일에서는 세로 정렬
-    alignItems: "center",
+    gridTemplateColumns: "repeat(2, 1fr)", // 모바일에서도 2열 그리드 유지
   },
 
   "@media (min-width: 481px) and (max-width: 768px)": {
-    flexDirection: "row", // 태블릿에서는 가로 정렬
-    justifyContent: "space-between",
+    gridTemplateColumns: "repeat(2, 1fr)", // 태블릿에서도 2열 그리드
   },
 
   "@media (min-width: 769px)": {
-    flexDirection: "row",
-    justifyContent: "space-around",
+    gridTemplateColumns: "repeat(2, 1fr)", // 데스크톱에서도 2열 그리드
   },
 });

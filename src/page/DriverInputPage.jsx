@@ -16,7 +16,7 @@ const DriverInputPage = () => {
     e.preventDefault();
     try {
       const response = await axios.post("/api/driver", {
-        user_id: 1, // 하드코딩된 user_id를 동적으로 처리할 수 있음
+        username: "Kim chulsu",
         post_cleaning_photo_url: photoUrl,
         dropoff_location: dropoffLocation,
         expected_route: expectedRoute,

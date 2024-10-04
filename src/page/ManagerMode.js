@@ -4,8 +4,8 @@ import { Button, Form, Alert } from "react-bootstrap";
 import axios from "axios";
 import CustomButton from "../component/common/CustomButton";
 import { Flex } from "../style/Flex";
-import DatePicker from "react-datepicker"; // react-datepicker import
-import "react-datepicker/dist/react-datepicker.css"; // react-datepicker 스타일 import
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 // 스타일 컴포넌트
 const Container = styled.div`
@@ -47,14 +47,10 @@ const ModeInfo = styled.div`
 `;
 
 const ManagerMode = () => {
-  const [startDate, setStartDate] = useState(null); // react-datepicker에서는 날짜 형식이 객체임
+  const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
-  const [logId, setLogId] = useState(null);
-  const [fileUrl, setFileUrl] = useState(null);
-  const [downloadStatus, setDownloadStatus] = useState("");
   const [errorMessage, setErrorMessage] = useState(null);
 
-  // 관리자 조회 처리
   const handleQuery = async (event) => {
     event.preventDefault();
 
@@ -67,42 +63,57 @@ const ManagerMode = () => {
     setErrorMessage(null); // 에러 초기화
 
     try {
-      const response = await axios.get("/api/management", {
-        params: {
-          start_date: startDate.toISOString().split("T")[0], // 날짜 포맷 조정
-          end_date: endDate.toISOString().split("T")[0],
-        },
-      });
+      const response = await axios.get(
+        "http://10.30.0.179:8080/api/management/export-investigation",
+        {
+          params: {
+            start_date: startDate.toISOString().split("T")[0],
+            end_date: endDate.toISOString().split("T")[0],
+          },
+          responseType: "blob",
+        }
+      );
 
-      if (response.data) {
-        setLogId(response.data.log_id);
-        setFileUrl(response.data.results_file_url);
-        setDownloadStatus(response.data.download_status);
+      if (response.status === 200) {
+        // blob으로 응답받은 파일들을 처리
+        const formData = new FormData();
+
+        const data = response.data; // 서버에서 받은 Blob 데이터
+        const fileNames = [
+          "coastline_histogram.png",
+          "prediction_histogram.png",
+          "waste_prediction_map.html",
+          "waste_map.html",
+        ];
+
+        // Blob 데이터를 각 파일 이름으로 저장
+        for (let i = 0; i < fileNames.length; i++) {
+          formData.append(fileNames[i], new Blob([data]), fileNames[i]);
+        }
+
+        // 파일 다운로드
+        fileNames.forEach((fileName) => {
+          const url = window.URL.createObjectURL(new Blob([data]));
+          const link = document.createElement("a");
+          link.href = url;
+          link.setAttribute("download", fileName);
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link); // 링크 제거
+        });
       }
     } catch (error) {
       console.error("Error querying management data:", error);
-      setErrorMessage("Failed to fetch data. Please try again.");
-    }
-  };
-
-  // 관리자 다운로드 처리
-  const handleDownload = async () => {
-    if (!logId) {
-      setErrorMessage("Log ID is not available.");
-      return;
-    }
-
-    try {
-      const response = await axios.post("/api/management/download", {
-        log_id: logId,
-      });
-
-      if (response.data && response.data.status === "success") {
-        window.open(response.data.file_url, "_blank");
+      if (error.response) {
+        console.error("Response error:", error.response.data);
+        setErrorMessage(`Error: ${error.response.data}`);
+      } else if (error.request) {
+        console.error("Request error:", error.request);
+        setErrorMessage("No response received from the server.");
+      } else {
+        console.error("Error message:", error.message);
+        setErrorMessage("An unexpected error occurred.");
       }
-    } catch (error) {
-      console.error("Error downloading the file:", error);
-      setErrorMessage("Failed to download the file. Please try again.");
     }
   };
 
@@ -142,38 +153,13 @@ const ManagerMode = () => {
               height: "40px",
               borderRadius: "8px",
             }}
+            onClick={handleQuery}
           >
             Query Data
           </CustomButton>
         </Form>
 
         {errorMessage && <Alert variant="danger">{errorMessage}</Alert>}
-
-        {logId && (
-          <div>
-            <p>
-              <strong>Log ID:</strong> {logId}
-            </p>
-            <p>
-              <strong>File URL:</strong> <a href={fileUrl}>{fileUrl}</a>
-            </p>
-            <p>
-              <strong>Download Status:</strong> {downloadStatus}
-            </p>
-            <CustomButton
-              backgroundColor="success"
-              onClick={handleDownload}
-              style={{
-                marginBottom: "30px",
-                width: "150px",
-                height: "40px",
-                borderRadius: "8px",
-              }}
-            >
-              Download File
-            </CustomButton>
-          </div>
-        )}
       </Container>
     </Flex>
   );

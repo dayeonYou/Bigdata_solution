@@ -10,7 +10,7 @@ const Container = styled.div`
   justify-content: center; /* 세로 가운데 정렬 */
   align-items: center; /* 가로 가운데 정렬 */
   height: 100vh; /* 전체 화면 높이 */
-  background-color: #f9f9f9; /* 배경색 */
+  //background-color: #f9f9f9; /* 배경색 */
 `;
 
 const Icon = styled.img`
@@ -45,7 +45,7 @@ const CleanerInfoPage = () => {
         깨끗한 환경을 만들어보세요!
       </Description>
       <CustomButton
-        to="/cleaner/form" // 버튼 클릭 시 이동할 경로 설정
+        to="/app/cleaner/form" // 버튼 클릭 시 이동할 경로 설정
         style={{
           marginTop: "20px", // 위 여백
           width: "150px", // 버튼 너비
