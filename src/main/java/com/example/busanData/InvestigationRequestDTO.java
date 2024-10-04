@@ -14,7 +14,7 @@ public class InvestigationRequestDTO {
     private String coast_name;
     private double length;
     private String pollution_level;
-    private String waste_type;
+    private int waste_type;
 
     // 위도와 경도 추가
     private double latitude;

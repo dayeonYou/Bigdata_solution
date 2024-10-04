@@ -36,7 +36,7 @@ public class Investigation {
     @Enumerated(EnumType.STRING)
     private PollutionLevel pollution_level;
 
-    private String waste_type;
+    private int waste_type;
 
     public enum PollutionLevel {
         LOW, MEDIUM, HIGH

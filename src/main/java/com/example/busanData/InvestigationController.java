@@ -36,7 +36,8 @@ public class InvestigationController {
         investigation.setLatitude(request.getLatitude());  // 위도 설정
         investigation.setLongitude(request.getLongitude()); // 경도 설정
         investigation.setPollution_level(Investigation.PollutionLevel.valueOf(request.getPollution_level().toUpperCase()));
-        investigation.setWaste_type(request.getWaste_type());
+        investigation.setWaste_type(request.getWaste_type());  // Use int value directly
+
 
         investigationRepository.save(investigation);
 
