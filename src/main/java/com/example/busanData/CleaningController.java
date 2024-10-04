@@ -61,7 +61,9 @@ public class CleaningController {
             position.setLat(cleaning.getLatitude().doubleValue()); // BigDecimal을 double로 변환
             position.setLng(cleaning.getLongitude().doubleValue()); // BigDecimal을 double로 변환
 
+            // CleaningResponseNewDTO에 cleaning_id도 포함하여 응답 생성
             CleaningResponseNewDTO responseDTO = new CleaningResponseNewDTO(
+                    cleaning.getCleaning_id(),     // cleaning_id 추가
                     position,
                     cleaning.getPhoto_url(),
                     cleaning.getCoast_name(),
@@ -73,6 +75,23 @@ public class CleaningController {
 
         // 리스트로 응답
         return ResponseEntity.ok(responseList);
+    }
+    // 특정 cleaning_id의 데이터 삭제
+    @DeleteMapping("/cleaning/{id}")
+    public ResponseEntity<?> deleteCleaning(@PathVariable("id") int cleaningId) {
+        // cleaning_id로 데이터베이스에서 해당 엔티티를 조회
+        Optional<Cleaning> cleaning = cleaningRepository.findById(cleaningId);
+
+        // 엔티티가 존재하지 않으면 에러 응답 반환
+        if (!cleaning.isPresent()) {
+            return ResponseEntity.badRequest().body("Cleaning record not found");
+        }
+
+        // 존재하면 삭제
+        cleaningRepository.delete(cleaning.get());
+
+        // 성공적으로 삭제된 경우 응답
+        return ResponseEntity.ok().body("Cleaning record deleted successfully");
     }
 
 }

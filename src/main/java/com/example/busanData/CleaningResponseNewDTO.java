@@ -9,6 +9,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class CleaningResponseNewDTO {
+    private int cleaning_id;       // cleaning_id 필드 추가
     private PositionDTO position;
     private String image;
     private String coast_name;

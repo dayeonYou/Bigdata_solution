@@ -23,7 +23,7 @@ public class ManagementController {
     private final RestTemplate restTemplate = new RestTemplate(); // For sending HTTP requests
 
     @GetMapping("/export-investigation")
-    public ResponseEntity<String> exportAndSendInvestigationCSV(
+    public ResponseEntity<List<String>> exportAndSendInvestigationCSV(
             @RequestParam("start_date") String startDateString,
             @RequestParam("end_date") String endDateString) {
         try {
@@ -54,17 +54,17 @@ public class ManagementController {
             body.add("file", fileResource);
 
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
-            ResponseEntity<String> flaskResponse = restTemplate.exchange(flaskServerUrl, HttpMethod.POST, requestEntity, String.class);
+            ResponseEntity<List<String>> flaskResponse = restTemplate.exchange(flaskServerUrl, HttpMethod.POST, requestEntity, (Class<List<String>>) (Class<?>) List.class);
 
-            // 5. Return the file URL from Flask server
+            // 5. Return the list of file URLs from Flask server
             if (flaskResponse.getStatusCode().is2xxSuccessful()) {
-                return ResponseEntity.ok(flaskResponse.getBody());  // Assuming Flask returns the file URL
+                return ResponseEntity.ok(flaskResponse.getBody());
             } else {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload CSV to Flask server.");
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
             }
 
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 
@@ -99,38 +99,6 @@ public class ManagementController {
                     .append(String.valueOf(log.getLatitude()))
                     .append(',')
                     .append(String.valueOf(log.getLongitude()))
-                    .append('\n');
-        }
-
-        return writer.toString();
-    }
-    private String generateCleaningCSV(List<Cleaning> cleaningLogs) throws IOException {
-        StringWriter writer = new StringWriter();
-        writer.append('\uFEFF'); // BOM (Byte Order Mark) for UTF-8
-        writer.append("cleaning_id,user_id,photo_url,timestamp,coast_name,length,collected_amount,waste_type,latitude,longitude,total_amount\n");
-
-        for (Cleaning log : cleaningLogs) {
-            writer.append(String.valueOf(log.getCleaning_id()))
-                    .append(',')
-                    .append(String.valueOf(log.getUser().getUser_id()))  // Assuming User has a getUserId() method
-                    .append(',')
-                    .append(log.getPhoto_url() != null ? log.getPhoto_url() : "")
-                    .append(',')
-                    .append(log.getTimestamp().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
-                    .append(',')
-                    .append(log.getCoast_name() != null ? log.getCoast_name() : "")
-                    .append(',')
-                    .append(String.valueOf(log.getLength()))
-                    .append(',')
-                    .append(String.valueOf(log.getCollected_amount()))
-                    .append(',')
-                    .append(String.valueOf(log.getWaste_type()))
-                    .append(',')
-                    .append(log.getLatitude() != null ? log.getLatitude().toString() : "")
-                    .append(',')
-                    .append(log.getLongitude() != null ? log.getLongitude().toString() : "")
-                    .append(',')
-                    .append(String.valueOf(log.getTotal_amount()))
                     .append('\n');
         }
 
