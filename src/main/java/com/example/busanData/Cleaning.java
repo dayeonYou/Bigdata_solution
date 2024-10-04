@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Setter
@@ -24,11 +25,18 @@ public class Cleaning {
     @Column(nullable = false)
     private LocalDateTime timestamp;
 
-    private String location;
     private String coast_name;
     private double length;
 
-    private double collected_amount;
-    private String waste_type;
+    private int collected_amount;
+    private int waste_type;
 
+    @Column(precision = 10, scale = 7)
+    private BigDecimal latitude;
+
+    @Column(precision = 10, scale = 7)
+    private BigDecimal longitude;
+
+
+    private int total_amount;
 }

@@ -14,5 +14,4 @@ public class CleaningResponse {
         this.status = status;
         this.cleaning_id = cleaning_id;
     }
-
 }

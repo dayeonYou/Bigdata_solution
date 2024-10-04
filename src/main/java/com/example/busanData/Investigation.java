@@ -15,18 +15,23 @@ public class Investigation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int investigation_id;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;  // org.apache.catalina.User 대신 직접 정의한 User 엔티티 사용
+    // username으로 변경
+    private String username;
 
     private String photo_url;
 
     @Column(nullable = false)
     private LocalDateTime timestamp;
 
-    private String location;
+    // location 필드 삭제
     private String coast_name;
     private double length;
+
+    @Column(name = "latitude", nullable = true)
+    private double latitude;
+
+    @Column(name = "longitude", nullable = true)
+    private double longitude;
 
     @Enumerated(EnumType.STRING)
     private PollutionLevel pollution_level;
