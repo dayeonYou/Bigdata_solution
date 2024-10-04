@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
+@CrossOrigin(origins = "http://localhost:3000")  // 허용할 도메인 명시
 @RestController
 @RequestMapping("/api")
 public class InvestigationController {
