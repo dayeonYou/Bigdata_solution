@@ -2,10 +2,10 @@ package com.example.busanData;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
@@ -25,7 +25,7 @@ public class ManagementController {
     private final RestTemplate restTemplate = new RestTemplate(); // For sending HTTP requests
 
     @GetMapping("/export-investigation")
-    public ResponseEntity<InputStreamResource> exportAndSendInvestigationCSV(
+    public ResponseEntity<MultiValueMap<String, InputStreamResource>> exportAndSendInvestigationCSV(
             @RequestParam("start_date") String startDateString,
             @RequestParam("end_date") String endDateString) {
         try {
@@ -58,21 +58,31 @@ public class ManagementController {
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
             ResponseEntity<Map> response = restTemplate.exchange(flaskServerUrl, HttpMethod.POST, requestEntity, Map.class);
 
-            // Get the HTML path from Flask response
-            String htmlPath = (String) response.getBody().get("html_path");
+            // Get the file paths from Flask response
+            String coastlineHistogramPath = (String) response.getBody().get("coastline_histogram");
+            String predictionHistogramPath = (String) response.getBody().get("prediction_histogram");
+            String wastePredictionMapPath = (String) response.getBody().get("waste_prediction_map");
+            String wasteMapPath = (String) response.getBody().get("waste_map");
 
-            // Return the HTML file contents directly
-            File htmlFile = new File(htmlPath);
-            InputStreamResource resource = new InputStreamResource(new FileInputStream(htmlFile));
+            // Prepare response for the frontend
+            MultiValueMap<String, InputStreamResource> responseResources = new LinkedMultiValueMap<>();
+
+            // Read and attach PNG and HTML files
+            InputStreamResource coastlineHistogramResource = new InputStreamResource(new FileInputStream(new File(coastlineHistogramPath)));
+            InputStreamResource predictionHistogramResource = new InputStreamResource(new FileInputStream(new File(predictionHistogramPath)));
+            InputStreamResource wastePredictionMapResource = new InputStreamResource(new FileInputStream(new File(wastePredictionMapPath)));
+            InputStreamResource wasteMapResource = new InputStreamResource(new FileInputStream(new File(wasteMapPath)));
+
+            responseResources.add("coastline_histogram", coastlineHistogramResource);
+            responseResources.add("prediction_histogram", predictionHistogramResource);
+            responseResources.add("waste_prediction_map", wastePredictionMapResource);
+            responseResources.add("waste_map", wasteMapResource);
 
             HttpHeaders responseHeaders = new HttpHeaders();
-            responseHeaders.add("Content-Disposition", "attachment; filename=report.html");
+            responseHeaders.setContentType(MediaType.MULTIPART_FORM_DATA);
 
-            return ResponseEntity.ok()
-                    .headers(responseHeaders)
-                    .contentLength(htmlFile.length())
-                    .contentType(MediaType.TEXT_HTML)
-                    .body(resource);
+            return new ResponseEntity<>(responseResources, responseHeaders, HttpStatus.OK);
+
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
