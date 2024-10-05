@@ -117,4 +117,24 @@ public class ManagementController {
 
         return writer.toString();
     }
+    @GetMapping("/get-firebase-image-url")
+    public ResponseEntity<Map<String, String>> getFirebaseImageUrl(@RequestParam String fileName) {
+        try {
+            // Flask 서버의 API 호출
+            String flaskServerUrl = "http://localhost:5000/api/get-image-url?file_name=" + fileName;
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<Map> response = restTemplate.getForEntity(flaskServerUrl, Map.class);
+
+            if (response.getStatusCode() == HttpStatus.OK) {
+                // Flask 서버에서 받은 이미지 URL을 프론트엔드로 반환
+                String fileUrl = (String) response.getBody().get("file_url");
+                return ResponseEntity.ok(Map.of("file_url", fileUrl));
+            } else {
+                return ResponseEntity.status(response.getStatusCode()).body(null);
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
 }
