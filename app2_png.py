@@ -157,12 +157,75 @@ def create_filtered_plotly_map(data, start_date, end_date):
         title=f"Marine Waste Collection Prediction ({start_date} - {end_date})"
     )
 
+    png_file_path = os.path.join(UPLOAD_FOLDER, 'waste_prediction_map.png')
+    fig.write_image(png_file_path, format='png')  # png 형식으로 저장
+    return png_file_path
+    filtered_data = data[(data['일'] >= start_date) & (data['일'] <= end_date)]
+    center_lat = filtered_data['latitude'].mean()
+    center_lon = filtered_data['longitude'].mean()
+
+    fig = go.Figure()
+    for year in filtered_data['년'].unique():
+        yearly_data = filtered_data[filtered_data['년'] == year]
+        fig.add_trace(go.Scattermapbox(
+            lat=yearly_data['latitude'],
+            lon=yearly_data['longitude'],
+            mode='markers',
+            marker=dict(
+                size=yearly_data['prediction'] / yearly_data['prediction'].max() * 100,
+                color=yearly_data['prediction'],
+                colorscale=[[0, 'lightpink'], [1, 'purple']],
+                cmin=yearly_data['prediction'].min(),
+                cmax=yearly_data['prediction'].max(),
+                sizemode='area',
+                showscale=True,
+                opacity=0.8
+            ),
+            hovertemplate="<b>%{hovertext}</b><br>수거 예측량: %{customdata} L<extra></extra>",
+            hovertext=yearly_data['coast_name'],
+            customdata=yearly_data['prediction'],
+            name=f'Year {year}',
+            visible=(year == filtered_data['년'].min())
+        ))
+
+    fig.update_layout(
+        mapbox_style="open-street-map",
+        mapbox=dict(center={"lat": center_lat, "lon": center_lon}, zoom=10),
+        margin={"r": 0, "t": 50, "l": 0, "b": 0},
+        title=f"Marine Waste Collection Prediction ({start_date} - {end_date})"
+    )
+
     html_file_path = os.path.join(UPLOAD_FOLDER, 'waste_prediction_map.html')
     fig.write_html(html_file_path)
     return html_file_path
 
 # Define the create_waste_type_map function
 def create_waste_type_map(data, start_date, end_date):
+    filtered_df = data[(data['일'] >= start_date) & (data['일'] <= end_date)]
+    fig = go.Figure()
+
+    for waste_type, group in filtered_df.groupby('waste_type'):
+        fig.add_trace(go.Scattermapbox(
+            lat=group['latitude'],
+            lon=group['longitude'],
+            mode='markers',
+            marker=go.scattermapbox.Marker(size=6),
+            hovertext=[f"해안명: {coast} / 주요 쓰레기 종류: {waste_type}" for coast in group['coast_name']],
+            hoverinfo="text",
+            name=waste_type
+        ))
+
+    fig.update_layout(
+        mapbox_style="open-street-map",
+        mapbox_zoom=10,
+        mapbox_center={"lat": filtered_df['latitude'].mean(), "lon": filtered_df['longitude'].mean()},
+        height=600,
+        title=f"날짜별 주요 쓰레기 종류 분포 ({start_date} - {end_date})"
+    )
+
+    png_file_path = os.path.join(UPLOAD_FOLDER, 'waste_map.png')
+    fig.write_image(png_file_path, format='png')  # png 형식으로 저장
+    return png_file_path
     filtered_df = data[(data['일'] >= start_date) & (data['일'] <= end_date)]
     fig = go.Figure()
 

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download Image</title>
+</head>
+<body>
+    <button id="download-btn">이미지 다운로드</button>
+
+    <script>
+        document.getElementById('download-btn').addEventListener('click', function () {
+            const imageUrl = 'https://storage.googleapis.com/busandata-81165.appspot.com/coastline_histogram.png';
+            
+            // 다운로드 링크 생성
+            const link = document.createElement('a');
+            link.href = imageUrl;
+            link.download = 'coastline_histogram.png'; // 다운로드할 파일 이름 설정
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link); // 다운로드 후 링크 제거
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>이미지 다운로드</title>
+</head>
+<body>
+    <button id="download-btn">이미지 다운로드</button>
+
+    <script>
+        // 이미지 URL -> Base64로 변환
+        function convertImgToBase64URL(url, callback, outputFormat){
+            var img = new Image();
+            img.crossOrigin = 'Anonymous'; // 크로스 도메인 문제 해결
+            img.onload = function(){
+                var canvas = document.createElement('CANVAS'),
+                ctx = canvas.getContext('2d'), dataURL;
+                canvas.height = img.height;
+                canvas.width = img.width;
+                ctx.drawImage(img, 0, 0);
+                dataURL = canvas.toDataURL(outputFormat);
+                callback(dataURL);
+                canvas = null; 
+            };
+            img.src = url;
+        }
+
+        // Base64 데이터를 사용해 파일 다운로드
+        function download(data, fileName, mimeType) {
+            var a = document.createElement('a');
+            a.href = data;
+            a.setAttribute('download', fileName);
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        // 버튼 클릭 시 실행
+        document.getElementById('download-btn').addEventListener('click', function () {
+            const imageUrl = 'https://storage.googleapis.com/busandata-81165.appspot.com/coastline_histogram.png';
+            
+            // 이미지 URL을 Base64로 변환 후 다운로드
+            convertImgToBase64URL(imageUrl, function(base64Img) {
+                download(base64Img, 'coastline_histogram.png', 'image/png');
+            });
+        });
+    </script>
+</body>
+</html>
