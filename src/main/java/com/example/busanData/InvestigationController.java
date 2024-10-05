@@ -53,4 +53,20 @@ public class InvestigationController {
         List<Investigation> investigations = investigationRepository.findAll();
         return ResponseEntity.ok(investigations);
     }
+
+    // 시작날짜와 끝날짜로 필터링된 Investigation 데이터를 반환하는 API
+    @GetMapping("/investigations/by-date")
+    public ResponseEntity<List<Investigation>> getInvestigationsByDate(
+            @RequestParam("startDate") String startDateStr,
+            @RequestParam("endDate") String endDateStr) {
+
+        // 날짜 문자열을 LocalDateTime으로 변환
+        LocalDateTime startDate = LocalDateTime.parse(startDateStr);
+        LocalDateTime endDate = LocalDateTime.parse(endDateStr);
+
+        // 특정 날짜 범위에 해당하는 데이터를 조회
+        List<Investigation> investigations = investigationRepository.findByTimestampBetween(startDate, endDate);
+
+        return ResponseEntity.ok(investigations);
+    }
 }
