@@ -2,14 +2,15 @@ package com.example.busanData;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.core.io.ByteArrayResource;  // 추가
 import org.springframework.util.MultiValueMap;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.StringWriter;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -25,7 +26,7 @@ public class ManagementController {
     private final RestTemplate restTemplate = new RestTemplate(); // For sending HTTP requests
 
     @GetMapping("/export-investigation")
-    public ResponseEntity<MultiValueMap<String, InputStreamResource>> exportAndSendInvestigationCSV(
+    public ResponseEntity<Map<String, String>> exportAndSendInvestigationCSV(
             @RequestParam("start_date") String startDateString,
             @RequestParam("end_date") String endDateString) {
         try {
@@ -58,30 +59,21 @@ public class ManagementController {
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
             ResponseEntity<Map> response = restTemplate.exchange(flaskServerUrl, HttpMethod.POST, requestEntity, Map.class);
 
-            // Get the file paths from Flask response
-            String coastlineHistogramPath = (String) response.getBody().get("coastline_histogram");
-            String predictionHistogramPath = (String) response.getBody().get("prediction_histogram");
-            String wastePredictionMapPath = (String) response.getBody().get("waste_prediction_map");
-            String wasteMapPath = (String) response.getBody().get("waste_map");
+            // Get the file URLs (links) from Flask response
+            String coastlineHistogramLink = (String) response.getBody().get("coastline_histogram");
+            String predictionHistogramLink = (String) response.getBody().get("prediction_histogram");
+            String wastePredictionMapLink = (String) response.getBody().get("waste_prediction_map");
+            String wasteMapLink = (String) response.getBody().get("waste_map");
 
-            // Prepare response for the frontend
-            MultiValueMap<String, InputStreamResource> responseResources = new LinkedMultiValueMap<>();
+            // Prepare response for the frontend with links
+            Map<String, String> responseLinks = Map.of(
+                    "coastline_histogram", coastlineHistogramLink,
+                    "prediction_histogram", predictionHistogramLink,
+                    "waste_prediction_map", wastePredictionMapLink,
+                    "waste_map", wasteMapLink
+            );
 
-            // Read and attach PNG and HTML files
-            InputStreamResource coastlineHistogramResource = new InputStreamResource(new FileInputStream(new File(coastlineHistogramPath)));
-            InputStreamResource predictionHistogramResource = new InputStreamResource(new FileInputStream(new File(predictionHistogramPath)));
-            InputStreamResource wastePredictionMapResource = new InputStreamResource(new FileInputStream(new File(wastePredictionMapPath)));
-            InputStreamResource wasteMapResource = new InputStreamResource(new FileInputStream(new File(wasteMapPath)));
-
-            responseResources.add("coastline_histogram", coastlineHistogramResource);
-            responseResources.add("prediction_histogram", predictionHistogramResource);
-            responseResources.add("waste_prediction_map", wastePredictionMapResource);
-            responseResources.add("waste_map", wasteMapResource);
-
-            HttpHeaders responseHeaders = new HttpHeaders();
-            responseHeaders.setContentType(MediaType.MULTIPART_FORM_DATA);
-
-            return new ResponseEntity<>(responseResources, responseHeaders, HttpStatus.OK);
+            return new ResponseEntity<>(responseLinks, HttpStatus.OK);
 
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
@@ -98,27 +90,28 @@ public class ManagementController {
         writer.append("investigation_id,username,photo_url,timestamp,coast_name,length,pollution_level,waste_type,prediction,latitude,longitude\n");
 
         for (Investigation log : investigationLogs) {
-            writer.append(String.valueOf(log.getInvestigation_id()))
+            // 기본형(int, double 등)은 null 체크가 필요 없음
+            writer.append(String.valueOf(log.getInvestigation_id()))  // 기본형은 null 처리 불필요
                     .append(',')
-                    .append(log.getUsername() != null ? log.getUsername() : "")
+                    .append(log.getUsername() != null ? log.getUsername() : "")  // null 처리
                     .append(',')
-                    .append(log.getPhoto_url() != null ? log.getPhoto_url() : "")
+                    .append(log.getPhoto_url() != null ? log.getPhoto_url() : "")  // null 처리
                     .append(',')
-                    .append(log.getTimestamp().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+                    .append(log.getTimestamp() != null ? log.getTimestamp().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) : "")  // null 처리
                     .append(',')
-                    .append(log.getCoast_name() != null ? log.getCoast_name() : "")
+                    .append(log.getCoast_name() != null ? log.getCoast_name() : "")  // null 처리
                     .append(',')
-                    .append(String.valueOf(log.getLength()))
+                    .append(String.valueOf(log.getLength()))  // 기본형은 null 처리 불필요
                     .append(',')
-                    .append(log.getPollution_level() != null ? log.getPollution_level().toString() : "")
+                    .append(log.getPollution_level() != null ? log.getPollution_level().toString() : "")  // null 처리
                     .append(',')
                     .append(String.valueOf(log.getWaste_type()))
                     .append(',')
-                    .append(log.getPrediction() != null ? log.getPrediction().toString() : "")
+                    .append(log.getPrediction() != null ? log.getPrediction().toString() : "")  // null 처리
                     .append(',')
-                    .append(String.valueOf(log.getLatitude()))
+                    .append(String.valueOf(log.getLatitude()))  // 기본형은 null 처리 불필요
                     .append(',')
-                    .append(String.valueOf(log.getLongitude()))
+                    .append(String.valueOf(log.getLongitude()))  // 기본형은 null 처리 불필요
                     .append('\n');
         }
 
