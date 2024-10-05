@@ -43,7 +43,11 @@ public class Investigation {
 
 
     public enum PollutionLevel {
-        LOW, MEDIUM, HIGH
+        low, medium, high;
+
+        public static PollutionLevel fromString(String value) {
+            return PollutionLevel.valueOf(value.toUpperCase());
+        }
     }
 
     // 필요한 생성자, Getter, Setter들 추가

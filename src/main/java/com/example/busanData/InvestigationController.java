@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @CrossOrigin(origins = "http://10.30.0.130:3000")  // 허용할 도메인 명시
@@ -35,7 +36,7 @@ public class InvestigationController {
         investigation.setLength(request.getLength());
         investigation.setLatitude(request.getLatitude());  // 위도 설정
         investigation.setLongitude(request.getLongitude()); // 경도 설정
-        investigation.setPollution_level(Investigation.PollutionLevel.valueOf(request.getPollution_level().toUpperCase()));
+        investigation.setPollution_level(Investigation.PollutionLevel.fromString(request.getPollution_level()));
         investigation.setWaste_type(request.getWaste_type());  // Use int value directly
 
 
@@ -44,5 +45,12 @@ public class InvestigationController {
         return ResponseEntity.ok().body(
                 new InvestigationResponse("success", investigation.getInvestigation_id())
         );
+    }
+
+    // 모든 Investigation 데이터를 반환하는 새로운 API 추가
+    @GetMapping("/investigations")
+    public ResponseEntity<List<Investigation>> getAllInvestigations() {
+        List<Investigation> investigations = investigationRepository.findAll();
+        return ResponseEntity.ok(investigations);
     }
 }
