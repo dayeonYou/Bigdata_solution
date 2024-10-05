@@ -1,12 +1,18 @@
 package com.example.busanData;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.*;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -18,31 +24,43 @@ public class LocationAnalysisController {
     private LocationAnalysisService locationAnalysisService;
 
     @PostMapping("/analysis")
-    public ResponseEntity<?> createLocationAnalysis(@RequestBody LocationAnalysis locationAnalysis) {
-        LocationAnalysis createdAnalysis = locationAnalysisService.createLocationAnalysis(locationAnalysis);
-        return ResponseEntity.status(HttpStatus.CREATED).body(
-                new ResponseMessage("success", createdAnalysis.getLocation_id())
-        );
+    public ResponseEntity<?> createLocationAnalysis() throws IOException {
+        // Cleaning 데이터를 가져옴
+        List<Cleaning> cleaningLogs = locationAnalysisService.getCleaningLogs();
+
+        // CSV 파일 생성
+        String csvData = generateCleaningCSV(cleaningLogs);
+        Files.write(Paths.get("C:/user/cleaning_data_test.csv"), csvData.getBytes(StandardCharsets.UTF_8));
+
+        // Flask 서버에 CSV 파일을 전송
+        String flaskUrl = "http://localhost:5000/analyze"; // Flask 서버 URL
+        RestTemplate restTemplate = new RestTemplate();
+
+        // 헤더 설정
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+        // CSV 데이터를 ByteArrayResource로 감싸서 파일처럼 전송
+        ByteArrayResource byteArrayResource = new ByteArrayResource(csvData.getBytes(StandardCharsets.UTF_8)) {
+            @Override
+            public String getFilename() {
+                return "cleaning_data.csv"; // 파일 이름
+            }
+        };
+
+        // Multipart 전송용 MultiValueMap 생성
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        body.add("file", byteArrayResource);  // CSV 파일 추가
+
+        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+
+        // Flask로 POST 요청
+        ResponseEntity<String> response = restTemplate.exchange(flaskUrl, HttpMethod.POST, requestEntity, String.class);
+
+        // Flask 서버로부터 응답받은 결과를 반환
+        return ResponseEntity.ok(response.getBody());
     }
 
-    // 응답 메시지 클래스
-    public static class ResponseMessage {
-        private String status;
-        private int location_id;
-
-        public ResponseMessage(String status, int location_id) {
-            this.status = status;
-            this.location_id = location_id;
-        }
-
-        public String getStatus() {
-            return status;
-        }
-
-        public int getLocation_id() {
-            return location_id;
-        }
-    }
     private String generateCleaningCSV(List<Cleaning> cleaningLogs) throws IOException {
         StringWriter writer = new StringWriter();
         writer.append('\uFEFF'); // BOM (Byte Order Mark) for UTF-8

@@ -1,0 +1,2 @@
+﻿cleaning_id,user_id,photo_url,timestamp,coast_name,length,collected_amount,waste_type,latitude,longitude,total_amount
+1,0,http://example.com/photo1.jpg,2024-10-05 14:39:11,Beach A,10.5,100,1,35.1234567,129.1234567,150
