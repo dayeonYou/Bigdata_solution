@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import axios from "axios";
 import { Form } from "react-bootstrap";
+import { useNavigate } from "react-router-dom"; // useNavigate 훅 import
 import CustomButton from "../component/common/CustomButton";
 import { Flex } from "../style/Flex";
 
@@ -36,7 +37,7 @@ const CheckboxContainer = styled.div`
 
 const ModeName = styled.div`
   font-family: "KotraHope";
-  font-size: 24px;
+  font-size: 40px;
   color: #0573ac;
   margin-bottom: 5px;
   letter-spacing: 0.08em;
@@ -73,7 +74,7 @@ const InvestigationInput = () => {
     coast_name: "",
     length: "",
     pollution_level: "",
-    waste_type: "", // 선택된 쓰레기 종류
+    waste_type: "",
     photo_url: "http://example.com/photo.jpg",
     timestamp: "",
     latitude: "",
@@ -81,6 +82,7 @@ const InvestigationInput = () => {
   });
 
   const [photoPreview, setPhotoPreview] = useState(null);
+  const navigate = useNavigate(); // useNavigate 훅 사용
 
   // **일시와 위도/경도 자동 등록**
   useEffect(() => {
@@ -119,7 +121,6 @@ const InvestigationInput = () => {
   // **쓰레기 종류 및 오염도 변경 핸들러**
   const handleTrashSelection = (event) => {
     const { value } = event.target;
-    // 숫자로 변환하여 상태 관리
     setFormData((prevData) => ({ ...prevData, waste_type: value }));
   };
 
@@ -131,19 +132,6 @@ const InvestigationInput = () => {
   // **제출 핸들러**
   const handleSubmit = async (event) => {
     event.preventDefault();
-
-    // 데이터 확인
-    console.log("Sending data:", {
-      username: formData.username,
-      photo_url: formData.photo_url,
-      timestamp: formData.timestamp,
-      coast_name: formData.coast_name,
-      length: parseFloat(formData.length),
-      pollution_level: formData.pollution_level,
-      waste_type: formData.waste_type, // 백엔드에 보낼 때는 여기에 숫자값
-      latitude: formData.latitude,
-      longitude: formData.longitude,
-    });
 
     try {
       const response = await axios.post(
@@ -167,10 +155,9 @@ const InvestigationInput = () => {
       );
 
       // 서버 응답 확인
-      console.log("Response from server:", response.data);
-
       if (response.data.status === "success") {
         alert(`Investigation submitted! ID: ${response.data.investigation_id}`);
+        navigate("/app/main"); // 제출 성공 시 /app/main으로 이동
       } else {
         console.warn("Submission failed:", response.data.message);
       }
@@ -200,11 +187,10 @@ const InvestigationInput = () => {
   return (
     <Flex>
       <ModeName>바다환경지킴이 모드</ModeName>
-      <ModeInfo>조사모드입니다! ~을 기록해요</ModeInfo>
 
       <Container>
         <Form onSubmit={handleSubmit}>
-          <Label>Coast Name</Label>
+          <Label>해안명</Label>
           <Form.Group>
             <InputField
               type="text"
@@ -215,7 +201,7 @@ const InvestigationInput = () => {
               }
             />
           </Form.Group>
-          <Label>해안길이(km)</Label>
+          <Label>해안길이(m)</Label>
           <Form.Group>
             <InputField
               type="number"
@@ -226,7 +212,7 @@ const InvestigationInput = () => {
               }
             />
           </Form.Group>
-          <Label>Photo</Label>
+          <Label>사진</Label>
           <Form.Group>
             {photoPreview ? (
               <PhotoPreview src={photoPreview} alt="Preview" />
@@ -247,11 +233,10 @@ const InvestigationInput = () => {
                   borderRadius: "8px",
                 }}
               >
-                Take Picture
+                사진 촬영
               </CustomButton>
             </Form.Group>
           </Form.Group>
-
           <Label>오염 정도 평가</Label>
           <Form.Group>
             <Form.Control
@@ -259,10 +244,10 @@ const InvestigationInput = () => {
               value={formData.pollution_level}
               onChange={handlePollutionLevelChange}
             >
-              <option value="">Select Pollution Level</option>
-              <option value="low">Low</option>
-              <option value="medium">Medium</option>
-              <option value="high">High</option>
+              <option value="">선택하세요</option>
+              <option value="low">low</option>
+              <option value="medium">medium</option>
+              <option value="high">high</option>
             </Form.Control>
           </Form.Group>
 
@@ -300,6 +285,7 @@ const InvestigationInput = () => {
           </CheckboxContainer>
 
           <CustomButton
+            to="/app/main"
             type="submit"
             backgroundColor="custom"
             custom="#007BFF"
@@ -309,9 +295,8 @@ const InvestigationInput = () => {
               height: "40px",
               borderRadius: "8px",
             }}
-            onClick={handleSubmit}
           >
-            Submit
+            제출하기
           </CustomButton>
         </Form>
       </Container>

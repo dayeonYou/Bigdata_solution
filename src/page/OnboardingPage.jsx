@@ -57,9 +57,9 @@ const OnboardingMsg = styled.div`
 `;
 
 const SolutionMsg = styled.div`
-  font-family: "KotraHope", sans-serif; /* fallback font 추가 */
+  //font-family: "KotraHope", sans-serif; fallback font 추가
   color: #666; /* 다크한 색상으로 변경 */
-  font-size: 1.2rem; /* 폰트 크기 증가 */
+  font-size: 1rem; /* 폰트 크기 증가 */
   letter-spacing: 0.05em;
   margin-bottom: 30px; /* 아래쪽 마진 조정 */
   text-align: center; /* 중앙 정렬 */

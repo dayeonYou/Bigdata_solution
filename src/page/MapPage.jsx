@@ -1,13 +1,16 @@
-import React, { useState, useEffect } from "react"; // Import useEffect
+import React, { useState, useEffect } from "react"; // useEffect 추가
 import WasteMap from "../component/WasteMap";
 import styled from "styled-components";
 import BasicStatistics from "../component/BasicStatistics";
 import axios from "axios"; // Import axios
+import MapImg from "../assets/icon/mapimg.svg";
+import { Button } from "react-bootstrap";
 
 const Title = styled.h1`
   text-align: center;
   margin: 2rem 0;
   font-size: 1.5rem;
+  font-weight: bold;
 
   @media (max-width: 768px) {
     font-size: 1.25rem;
@@ -15,11 +18,14 @@ const Title = styled.h1`
 `;
 
 const MapContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   margin-bottom: 3rem;
   padding: 1rem;
   border: 1px solid #ccc;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 
   @media (max-width: 768px) {
     padding: 0.5rem;
@@ -34,7 +40,7 @@ const TabContainer = styled.div`
 `;
 
 const Tab = styled.button`
-  background-color: ${(props) => (props.active ? "#4CAF50" : "#f1f1f1")};
+  background-color: ${(props) => (props.active ? "#0AAFDE" : "#f1f1f1")};
   color: ${(props) => (props.active ? "white" : "black")};
   border: none;
   padding: 10px 20px;
@@ -43,7 +49,7 @@ const Tab = styled.button`
   font-size: 1.2rem;
 
   &:hover {
-    background-color: #ddd;
+    background-color: #098bb0;
   }
 
   @media (max-width: 768px) {
@@ -52,24 +58,36 @@ const Tab = styled.button`
   }
 `;
 
+const IconImage = styled.img`
+  width: 100%;
+  height: 80%;
+`;
+
+const DateInputContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 3rem;
+  margin-bottom: 100px;
+`;
+
 const DateInput = styled.input`
   padding: 10px;
-  margin: 1rem;
+  margin: 0 10px;
   border: 1px solid #ccc;
   border-radius: 4px;
 `;
 
 const SubmitButton = styled.button`
-  padding: 10px 20px;
-  margin: 1rem;
+  padding: 10px 5px;
   border: none;
   border-radius: 4px;
-  background-color: #4caf50;
+  background-color: #0aafde;
   color: white;
   cursor: pointer;
-
+  margin-right: 5px;
   &:hover {
-    background-color: #45a049;
+    background-color: #098bb0;
   }
 `;
 
@@ -78,6 +96,7 @@ const MapPage = () => {
   const [startDate, setStartDate] = useState("2024-10-01");
   const [endDate, setEndDate] = useState("2024-10-01");
   const [filteredData, setFilteredData] = useState([]);
+  const [showMapImage, setShowMapImage] = useState(false); // 이미지 표시 상태 관리
 
   // Function to fetch data based on date range
   const fetchData = async () => {
@@ -102,22 +121,29 @@ const MapPage = () => {
   const handleDateChange = () => {
     fetchData();
     console.log("filteredData", filteredData);
+
+    // 이미지 표시 상태를 5초 뒤에 true로 설정
+    setTimeout(() => {
+      setShowMapImage(true);
+    }, 5000);
   };
 
   return (
     <div>
-      <DateInput
-        type="date"
-        value={startDate}
-        onChange={(e) => setStartDate(e.target.value)}
-      />
-      <DateInput
-        type="date"
-        value={endDate}
-        onChange={(e) => setEndDate(e.target.value)}
-      />
-
-      <SubmitButton onClick={handleDateChange}>완료</SubmitButton>
+      {/* 날짜 입력과 완료 버튼을 가로로 배치 */}
+      <DateInputContainer>
+        <DateInput
+          type="date"
+          value={startDate}
+          onChange={(e) => setStartDate(e.target.value)}
+        />
+        <DateInput
+          type="date"
+          value={endDate}
+          onChange={(e) => setEndDate(e.target.value)}
+        />
+        <SubmitButton onClick={handleDateChange}>완료</SubmitButton>
+      </DateInputContainer>
 
       <TabContainer>
         <Tab active={activeTab === 1} onClick={() => setActiveTab(1)}>
@@ -135,18 +161,17 @@ const MapPage = () => {
             {filteredData.length > 0 ? (
               <WasteMap data={filteredData} />
             ) : (
-              <p>수거예측량 데이터가 없습니다.</p>
+              <p>수거예측량 분포를 확인하려면, 날짜를 입력해주세요!</p>
             )}
           </MapContainer>
           <MapContainer>
             <Title>주요쓰레기 분포</Title>
-            {filteredData.length > 0 ? (
-              <WasteMap data={filteredData} />
-            ) : (
-              <p>주요쓰레기 데이터가 없습니다.</p>
-            )}
+            {/* showMapImage가 true일 때 이미지를 렌더링 */}
+            {showMapImage ? <IconImage src={MapImg} /> : <p></p>}
+
+            {filteredData.length === 0 && <p></p>}
+            <Button style={{ margin: "10px 0" }}>다운로드</Button>
           </MapContainer>
-          {filteredData.length === 0 && <p>데이터가 없습니다.</p>}
         </>
       )}
       {activeTab === 2 && (

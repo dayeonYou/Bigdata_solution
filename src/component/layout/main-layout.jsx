@@ -31,7 +31,7 @@ function Header() {
         <LogoImg
           src={KIOSTLogo}
           alt="KIOST Logo"
-          onClick={() => navigate("/")}
+          onClick={() => navigate("/app/main")}
         />
       </HeaderSection>
       <HeaderSection justifyContent="flex-end">

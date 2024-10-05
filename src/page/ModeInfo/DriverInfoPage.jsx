@@ -57,21 +57,20 @@ const DriverInfoPage = () => {
 
   return (
     <Container>
-      <Icon src={DriverIcon} alt="Manager Mode Icon" />{" "}
-      {/* 아이콘 클릭 시 모달 열기 */}
+      <Icon src={DriverIcon} alt="Manager Mode Icon" />
       <TitleContainer>
         <Title>운전자 모드란?</Title>
       </TitleContainer>
       <Description>
-        운전자 모드는 수거 차량 운전자가 쉽게 사용할 수 있는 기능입니다. 이
-        모드를 통해 청소 후 수거 장소를 지도에서 확인하고, 예상되는 운송량과
-        이동 경로를 직관적으로 확인할 수 있습니다. 경로를 수정할 수도 있으며,
-        쓰레기를 탑재한 후 완료 버튼을 누르면 해당 장소가 자동으로 목록에서
-        사라져 편리하게 관리할 수 있습니다.
+        운전자모드는 청소 장소의 수거위치와 수거 양을 표시해요.
+        <br />
+        운전자는 수거할 장소로 이동 후, 완료 버튼을 눌러 수거를 완료할 수
+        있습니다. 수거 완료 시 해당 정보는 목록에서 사라지며, 운반 일시 등의
+        정보가 자동으로 입력됩니다.
       </Description>
-      <AlertIconStyled onClick={handleShow} /> {/* 느낌표 아이콘 */}
+
       <CustomButton
-        to="/app/driver/form" // 버튼 클릭 시 이동할 경로 설정
+        to="/app/driver/form"
         style={{
           marginTop: "20px", // 위 여백
           width: "150px", // 버튼 너비
@@ -81,26 +80,6 @@ const DriverInfoPage = () => {
       >
         들어가기
       </CustomButton>
-      {/* 모달 컴포넌트 */}
-      <Modal show={showModal} onHide={handleClose}>
-        <Modal.Header closeButton>
-          <Modal.Title>운전자 모드 자세히 보기</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          운전자 모드는 수거 차량 운전자가 쉽게 사용할 수 있는 기능입니다.
-          <br />
-          이 모드를 통해 청소 후 수거 장소를 지도에서 확인하고, 예상되는
-          운송량과 이동 경로를 직관적으로 확인할 수 있습니다.
-          <br />
-          경로를 수정할 수도 있으며, 쓰레기를 탑재한 후 완료 버튼을 누르면 해당
-          장소가 자동으로 목록에서 사라져 편리하게 관리할 수 있습니다.
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
-            닫기
-          </Button>
-        </Modal.Footer>
-      </Modal>
     </Container>
   );
 };

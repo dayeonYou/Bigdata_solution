@@ -5,9 +5,7 @@ import { Flex } from "../style/Flex"; // Flex 스타일 경로 확인
 import styled from "styled-components";
 
 // 각 페이지 컴포넌트 import
-import DriverInputPage from "./DriverInputPage";
-import TransportPage from "./TransportPage";
-import LocationAnalysisPage from "./LocationAnalysisPage";
+
 import CollectMode from "../component/CollectMode";
 
 // 스타일 컴포넌트
@@ -27,7 +25,7 @@ const Container = styled.div`
 `;
 const ModeName = styled.div`
   font-family: "KotraHope"; /* 원하는 폰트로 변경 */
-  font-size: 24px;
+  font-size: 50px;
   color: #0573ac;
   margin-bottom: 5px;
   letter-spacing: 0.08em; /* 글자 간격을 조금 넓힘 */
@@ -75,22 +73,9 @@ const DriverModePage = () => {
     <Flex>
       <>
         <ModeName>운전자 모드</ModeName>
-        <ModeInfo>운전 관련 정보를 기록하세요.</ModeInfo>
       </>
       <Container>
         <CollectMode />
-        <StyledTabs defaultActiveKey="input" onSelect={handleSelect}>
-          <StyledTab eventKey="input" title="운전 정보 입력" />
-          <StyledTab eventKey="transport" title="운송량 기록" />
-          <StyledTab eventKey="location-analysis" title="위치 분석" />
-        </StyledTabs>
-
-        {/* 페이지 라우팅 설정 */}
-        <Routes>
-          <Route path="input" element={<DriverInputPage />} />
-          <Route path="transport" element={<TransportPage />} />
-          <Route path="location-analysis" element={<LocationAnalysisPage />} />
-        </Routes>
       </Container>
     </Flex>
   );

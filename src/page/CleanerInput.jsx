@@ -41,7 +41,7 @@ const CheckboxContainer = styled.div`
 
 const ModeName = styled.div`
   font-family: "KotraHope";
-  font-size: 24px;
+  font-size: 40px;
   color: #0573ac;
   margin-bottom: 5px;
   letter-spacing: 0.08em;
@@ -79,10 +79,10 @@ const TrashTypeLabel = styled.span`
 const CleanerInput = () => {
   const [formData, setFormData] = useState({
     username: "Kim chulsu",
-    coast_name: "",
-    length: "",
+    coast_name: "이천길 1", // 해안명 하드코딩
+    length: "60", // 해안길이 하드코딩
     collected_amount: "",
-    waste_type: "", // 이 값을 숫자로 변경
+    waste_type: "",
     photo_url: "http://example.com/photo.jpg",
     timestamp: "",
     latitude: "",
@@ -123,7 +123,6 @@ const CleanerInput = () => {
     input.click();
   };
 
-  // 주요 쓰레기 종류와 매핑
   const trashTypes = [
     { type: "페어구류", example: "(그물, 밧줄, 양식 자재 등)", value: 1 },
     { type: "부표류", example: "(스티로폼 부표, 인증 부표 등)", value: 2 },
@@ -138,13 +137,12 @@ const CleanerInput = () => {
 
   const handleTrashSelection = (event) => {
     const { value } = event.target;
-    setFormData((prevData) => ({ ...prevData, waste_type: value })); // 숫자 값을 사용
+    setFormData((prevData) => ({ ...prevData, waste_type: value }));
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    // 전송할 데이터 형태를 콘솔에 출력
     const dataToSend = {
       username: formData.username,
       photo_url: formData.photo_url,
@@ -152,21 +150,21 @@ const CleanerInput = () => {
       coast_name: formData.coast_name,
       length: parseFloat(formData.length),
       collected_amount: parseFloat(formData.collected_amount),
-      waste_type: parseInt(formData.waste_type, 10), // 숫자형으로 변환하여 전송
-      latitude: formData.latitude, // 위도 추가
-      longitude: formData.longitude, // 경도 추가
+      waste_type: parseInt(formData.waste_type, 10),
+      latitude: formData.latitude,
+      longitude: formData.longitude,
     };
 
-    console.log("Sending data to the backend:", dataToSend); // 데이터 형태 출력
+    console.log("Sending data to the backend:", dataToSend);
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/investigation",
-        dataToSend // 수정된 데이터 사용
+        "http://10.30.0.179:8080/api/investigation",
+        dataToSend
       );
 
       if (response.data.status === "success") {
-        alert(`Cleanup submitted! ID: ${response.data.cleanup_id}`);
+        alert("Cleanup submitted! ID: ");
       }
     } catch (error) {
       console.error("Error submitting the cleanup:", error);
@@ -185,22 +183,16 @@ const CleanerInput = () => {
           <Form.Group>
             <InputField
               type="text"
-              placeholder="Enter the name of the coast"
               value={formData.coast_name}
-              onChange={(e) =>
-                setFormData({ ...formData, coast_name: e.target.value })
-              }
+              readOnly // 해안명을 읽기 전용으로 설정
             />
           </Form.Group>
           <Label>해안길이 (km)</Label>
           <Form.Group>
             <InputField
               type="number"
-              placeholder="Enter the coast length"
               value={formData.length}
-              onChange={(e) =>
-                setFormData({ ...formData, length: e.target.value })
-              }
+              readOnly // 해안길이를 읽기 전용으로 설정
             />
           </Form.Group>
           <Label>사진</Label>
@@ -246,7 +238,6 @@ const CleanerInput = () => {
             <InputField type="text" value={formData.timestamp} readOnly />
           </Form.Group>
 
-          {/* 위도와 경도를 별도로 표시 */}
           <Form.Group>
             <Label>위도</Label>
             <InputField type="text" value={formData.latitude} readOnly />
@@ -268,10 +259,10 @@ const CleanerInput = () => {
                     <TrashTypeLabel> {trash.example}</TrashTypeLabel>
                   </>
                 }
-                value={trash.value} // 숫자 값을 사용
+                value={trash.value}
                 name="trashType"
                 onChange={handleTrashSelection}
-                checked={formData.waste_type === trash.value.toString()} // 비교 시 문자열로 변환
+                checked={formData.waste_type === trash.value.toString()}
               />
             ))}
           </CheckboxContainer>
@@ -285,6 +276,7 @@ const CleanerInput = () => {
               height: "40px",
               borderRadius: "8px",
             }}
+            to="/app/main"
             onClick={handleSubmit}
           >
             제출

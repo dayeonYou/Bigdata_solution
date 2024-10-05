@@ -95,7 +95,7 @@ const WasteMap = ({ data }) => {
         </MapContainer>
       </div>
       <Button onClick={handleDownloadImage} style={{ margin: "10px 0" }}>
-        현재 지도 저장
+        다운로드
       </Button>
     </>
   );
