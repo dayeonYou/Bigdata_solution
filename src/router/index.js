@@ -4,7 +4,7 @@ import InvestigationInput from "../page/InvestigationInput";
 import InvestigationInfoPage from "../page/ModeInfo/InvestigationInfoPage";
 import MainPage from "../page/MainPage";
 import CleanerInput from "../page/CleanerInput";
-import ManagerMode from "../page/ManagerMode";
+import ManagerMode from "../component/BasicStatistics";
 import ManagerInfoPage from "../page/ModeInfo/ManagerInfoPage";
 import CleanerInfoPage from "../page/ModeInfo/CleanerInfoPage copy";
 import DriverModePage from "../page/DriverModePage";
@@ -14,7 +14,7 @@ import LocationAnalysisPage from "../page/LocationAnalysisPage";
 import DriverInputPage from "../page/DriverInputPage";
 import LoginForm from "../page/LoginPage";
 import OnboardingPage from "../page/OnboardingPage";
-
+import MapPage from "../page/MapPage";
 const router = createBrowserRouter([
   {
     path: "/", // OnboardingPage를 루트 경로에 설정
@@ -54,7 +54,7 @@ const router = createBrowserRouter([
       },
       {
         path: "manager/form",
-        element: <ManagerMode />,
+        element: <MapPage />,
       },
       {
         path: "driver",

@@ -9,7 +9,7 @@ import axios from "axios";
 const FlyToLocation = ({ lat, lng }) => {
   const map = useMap();
   useEffect(() => {
-    map.flyTo([lat, lng], 18, { duration: 2 }); // 여기에서 14를 16으로 변경
+    map.flyTo([lat, lng], 20, { duration: 2 });
   }, [lat, lng, map]);
   return null;
 };
@@ -20,7 +20,9 @@ const CollectMode = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedLatLng, setSelectedLatLng] = useState(null);
   const [showMore, setShowMore] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
+  // API에서 청소 데이터를 가져오는 함수
   const fetchCleaningInfo = async () => {
     try {
       const response = await axios.get(
@@ -32,6 +34,7 @@ const CollectMode = () => {
         }
       );
       setLocations(response.data);
+      console.log("response.data", response.data); // 데이터 확인을 위한 콘솔 로그
     } catch (error) {
       console.error("Error fetching cleaning info:", error);
     }
@@ -46,11 +49,27 @@ const CollectMode = () => {
     setShowModal(true);
   };
 
-  const handleComplete = () => {
-    setLocations((prevLocations) =>
-      prevLocations.filter((loc) => loc !== selectedImage)
-    );
-    setShowModal(false);
+  // DELETE 요청을 통해 데이터를 삭제하는 함수
+  const handleComplete = async () => {
+    if (selectedImage) {
+      try {
+        // cleaning_id를 경로에 포함하여 DELETE 요청 전송
+        await axios.delete(
+          `http://10.30.0.179:8080/api/cleaning/${selectedImage.cleaning_id}`
+        );
+
+        // 상태에서 해당 항목 제거하여 UI 업데이트
+        setLocations((prevLocations) =>
+          prevLocations.filter(
+            (loc) => loc.cleaning_id !== selectedImage.cleaning_id
+          )
+        );
+        setShowModal(false); // 모달 닫기
+      } catch (error) {
+        setErrorMessage("Error deleting cleaning data.");
+        console.error("Error deleting cleaning data:", error);
+      }
+    }
   };
 
   const handleClose = () => setShowModal(false);
@@ -173,6 +192,7 @@ const CollectMode = () => {
               />
               <p>위치명: {selectedImage.coast_name || "위치명이 없습니다."}</p>
               <p>수거된 양: {selectedImage.collected_amount || 0}개</p>
+              {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
             </>
           )}
         </Modal.Body>

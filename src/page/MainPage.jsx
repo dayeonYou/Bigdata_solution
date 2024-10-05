@@ -1,9 +1,15 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ModeContainer from "../component/ModeContainer";
 import { styled } from "@stitches/react";
 
 export default function MainPage() {
-  const [username, setUsername] = useState("김철수");
+  const [username, setUsername] = useState("");
+
+  // 로그인된 사용자의 이름을 로컬스토리지에서 가져옴
+  useEffect(() => {
+    const storedUsername = localStorage.getItem("username");
+    setUsername(storedUsername || "Guest"); // 저장된 값이 없으면 "Guest"로 설정
+  }, []);
 
   return (
     <MainContainer>
@@ -28,7 +34,7 @@ const MainContainer = styled("div", {
   alignItems: "center",
   padding: "20px",
   width: "100%",
-  maxWidth: "1200px", // 적절한 최대 너비로 설정
+  maxWidth: "1200px",
   margin: "0 auto",
 });
 
@@ -51,10 +57,10 @@ const TitleWrapper = styled("div", {
 });
 
 const Title = styled("h1", {
-  fontSize: "30px", // 더 큰 글씨로 강조
+  fontSize: "30px",
   fontWeight: "bold",
   whiteSpace: "nowrap",
-  color: "#333", // 텍스트 색상
+  color: "#333",
 });
 
 const Subtitle = styled("h2", {
@@ -66,10 +72,10 @@ const Subtitle = styled("h2", {
 
 const ActivitySection = styled("section", {
   width: "100%",
-  maxWidth: "800px", // 최대 너비를 ModeContainer와 맞추기
+  maxWidth: "800px",
   marginBottom: "20px",
   padding: "10px",
   boxSizing: "border-box",
   borderRadius: "8px",
-  backgroundColor: "#FAFAFA", // 배경색 추가
+  backgroundColor: "#FAFAFA",
 });

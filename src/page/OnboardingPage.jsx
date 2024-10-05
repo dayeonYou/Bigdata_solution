@@ -1,8 +1,9 @@
 import styled from "styled-components";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { ReactComponent as OceanLogo } from "../assets/icon/CleanerIcon.svg"; // 새로운 로고를 추가하세요
+import { ReactComponent as OceanLogo } from "../assets/icon/Logo.svg"; // 새로운 로고를 추가하세요
 import CustomButton from "../component/common/CustomButton";
+
 const OnboardingPage = () => {
   const [fade, setFade] = useState("start");
   const [buttonFade, setButtonFade] = useState("");
@@ -19,7 +20,7 @@ const OnboardingPage = () => {
   return (
     <div className="wrap">
       <OnboardingWrap>
-        <OceanLogo className={fade} />
+        <OceanLogo className={fade} style={{ width: "60%", height: "auto" }} />
 
         <OnboardingMsg>바다환경지킴이</OnboardingMsg>
         <SolutionMsg>빅데이터 기반 해양쓰레기 수거 솔루션</SolutionMsg>
@@ -32,61 +33,34 @@ const OnboardingPage = () => {
 };
 
 export default OnboardingPage;
+
 const OnboardingWrap = styled.div`
   display: flex;
   background-color: #e0f7fa; /* 해양을 연상시키는 밝은 색상 */
-  justify-content: space-evenly;
+  justify-content: center;
   align-items: center;
   flex-direction: column;
-  width: 100%; /* 폭을 조금 더 늘렸습니다 */
-  height: 100%;
+  width: 100%;
+  height: 100vh; /* 화면 전체 높이를 차지하도록 설정 */
   border-radius: 20px; /* 경계선 둥글게 */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 부드러운 그림자 추가 */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* 부드러운 그림자 추가 */
+  padding: 20px; /* 내부 여백 추가 */
 `;
 
 const OnboardingMsg = styled.div`
-  font-family: "KotraHope";
-  color: #0aafde; /* 바다 색상 */
-  font-size: 1.5rem; /* 폰트 크기 증가 */
+  font-family: "KotraHope", sans-serif; /* fallback font 추가 */
+  color: #0aafde; /* 버튼과 동일한 색상 */
+  font-size: 2rem; /* 폰트 크기 증가 */
   letter-spacing: 0.1em;
-  margin-bottom: 10vh; /* 아래쪽 마진을 줄였습니다 */
+  margin: 20px 0; /* 여백 조정 */
+  text-align: center; /* 중앙 정렬 */
 `;
 
 const SolutionMsg = styled.div`
-  font-family: "KotraHope";
-  color: #0aafde; /* 바다 색상 */
-  font-size: 1rem;
-  letter-spacing: 0.1em;
-  margin-bottom: 20vh; /* 아래쪽 마진 조정 */
-`;
-
-const StartButton = styled(Link)`
-  font-size: 16px; /* 폰트 크기 증가 */
-  background-color: #00796b; /* 버튼 색상 */
-  color: white;
-  text-decoration: none;
-  border-radius: 20px;
-  padding: 12px 80px;
-  text-align: center;
-  width: 40%; /* 버튼 폭 증가 */
-
-  cursor: pointer;
-  font-family: Pretendard;
-  opacity: 0; /* 초기에는 투명하게 설정 */
-  transition: opacity 2s; /* transition 효과 설정 */
-
-  &.fade-in {
-    opacity: 1; /* transition으로 인해 서서히 나타나도록 설정 */
-  }
-`;
-
-const StyledImg = styled.img`
-  width: 70%;
-  height: 25%;
-  opacity: 0; /* 초기에는 투명하게 설정 */
-  transition: opacity 2s; /* transition 효과 설정 */
-
-  &.end {
-    opacity: 1; /* transition으로 인해 서서히 나타나도록 설정 */
-  }
+  font-family: "KotraHope", sans-serif; /* fallback font 추가 */
+  color: #666; /* 다크한 색상으로 변경 */
+  font-size: 1.2rem; /* 폰트 크기 증가 */
+  letter-spacing: 0.05em;
+  margin-bottom: 30px; /* 아래쪽 마진 조정 */
+  text-align: center; /* 중앙 정렬 */
 `;

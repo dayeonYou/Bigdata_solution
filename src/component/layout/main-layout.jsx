@@ -1,7 +1,7 @@
 import { Box, Section, Container } from "@radix-ui/themes";
 import { styled } from "@stitches/react";
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom"; // useLocation 추가
 import { Outlet } from "react-router-dom";
 import { Flex } from "../../style/Flex";
 import KIOSTLogo from "../../assets/icon/KIOST.svg"; // KIOST 로고 이미지 가져오기
@@ -10,50 +10,42 @@ function Header() {
   const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 상태 관리
 
-  // 로그인 상태를 체크하는 useEffect
   useEffect(() => {
     const token = localStorage.getItem("token");
     setIsLoggedIn(!!token); // 토큰이 있으면 로그인 상태로 설정
   }, []);
 
-  // 로고 클릭 핸들러
-  const handleLogoClick = () => {
-    navigate("/");
-  };
-
   // 로그아웃 핸들러
   const handleLogout = () => {
-    localStorage.removeItem("token"); // 토큰 삭제
-    setIsLoggedIn(false); // 로그인 상태 업데이트
-    navigate("/"); // 로그아웃 후 메인 페이지로 이동
-  };
-
-  // 로그인 핸들러
-  const handleLogin = () => {
-    navigate("/login"); // 로그인 페이지로 이동
+    if (window.confirm("로그아웃 하시겠습니까?")) {
+      localStorage.removeItem("token"); // 토큰 삭제
+      localStorage.removeItem("username"); // 저장된 이름 삭제
+      setIsLoggedIn(false); // 로그인 상태 업데이트
+      navigate("/"); // 로그아웃 후 로그인 페이지로 이동
+    }
   };
 
   return (
     <HeaderWrap>
       <HeaderSection justifyContent="flex-start">
-        {/* 로고 이미지 추가 */}
-        <LogoImg src={KIOSTLogo} alt="KIOST Logo" onClick={handleLogoClick} />
+        <LogoImg
+          src={KIOSTLogo}
+          alt="KIOST Logo"
+          onClick={() => navigate("/")}
+        />
       </HeaderSection>
       <HeaderSection justifyContent="flex-end">
         {isLoggedIn ? (
-          <>
-            <HeaderText onClick={handleLogout}>로그아웃</HeaderText>
-            <HeaderText>마이페이지</HeaderText>
-          </>
+          <HeaderText onClick={handleLogout}>로그아웃</HeaderText>
         ) : (
-          <>
-            <HeaderText onClick={handleLogin}>로그인</HeaderText>
-          </>
+          <HeaderText onClick={() => navigate("/app/login")}>로그인</HeaderText>
         )}
       </HeaderSection>
     </HeaderWrap>
   );
 }
+
+export default Header;
 
 const Content = ({ children }) => {
   return (
@@ -67,11 +59,15 @@ const Content = ({ children }) => {
   );
 };
 
+// MainLayout 컴포넌트 수정: 로그인 페이지에서는 Header를 숨김
 const MainLayout = () => {
+  const location = useLocation(); // 현재 경로를 가져옴
+
   return (
     <Box height={"100%"}>
       <Flex direction={"column"} height={"100%"}>
-        <Header />
+        {/* 로그인 페이지가 아니면 Header를 보여줌 */}
+        {location.pathname !== "/app/login" && <Header />}
         <Content>
           <Outlet />
         </Content>
